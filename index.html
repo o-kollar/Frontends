@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amber × Spok — Complete Design System</title>
+<!-- Only typography loaded; NO icon font or CDN -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   1. DESIGN TOKENS
+   ========================================================================== */
+:root {
+  /* Surfaces & Backgrounds */
+  --bg: #F9F8F6;
+  --surface: #FFFFFF;
+  --surface-alt: #F3EFE9;
+  --surface-hover: #ECE7DE;
+  --border: #E5DFD5;
+  --border-focus: #D4622B;
+
+  /* Typography */
+  --text: #191817;
+  --text-muted: #68625B;
+  --text-faint: #989187;
+
+  /* Brand Accent (Terracotta Ember) */
+  --accent: #D4622B;
+  --accent-tint: rgba(212, 98, 43, 0.09);
+  --accent-glow: rgba(212, 98, 43, 0.22);
+  --accent-contrast: #FFFFFF;
+
+  /* Semantic State */
+  --success: #1E8E3E;
+  --success-dim: #EAF5ED;
+  --warning: #B77900;
+  --warning-dim: #FDF5E5;
+  --danger: #D93025;
+  --danger-dim: #FCEAE8;
+  --info: #2563EB;
+  --info-dim: #EFF6FF;
+
+  /* Geometry Scale */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-pill: 9999px;
+  --r-bubble: 18px;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 3px rgba(25, 24, 23, 0.05), 0 4px 10px rgba(25, 24, 23, 0.03);
+  --shadow-md: 0 4px 14px rgba(25, 24, 23, 0.07), 0 16px 28px rgba(25, 24, 23, 0.04);
+  --shadow-lg: 0 12px 36px rgba(25, 24, 23, 0.10), 0 28px 64px rgba(25, 24, 23, 0.06);
+
+  /* Fonts */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Transitions */
+  --dur-fast: 140ms;
+  --dur-med: 260ms;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  --bg: #121211;
+  --surface: #1B1A19;
+  --surface-alt: #242220;
+  --surface-hover: #2C2926;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-focus: #F08E5A;
+
+  --text: #F5F3EF;
+  --text-muted: #A59D92;
+  --text-faint: #736C63;
+
+  --accent: #F08E5A;
+  --accent-tint: rgba(240, 142, 90, 0.15);
+  --accent-glow: rgba(240, 142, 90, 0.32);
+  --accent-contrast: #18110D;
+
+  --success: #53C378;
+  --success-dim: rgba(83, 195, 120, 0.14);
+  --warning: #F2B957;
+  --warning-dim: rgba(242, 185, 87, 0.14);
+  --danger: #F16E63;
+  --danger-dim: rgba(241, 110, 99, 0.14);
+  --info: #6BA5FA;
+  --info-dim: rgba(107, 165, 250, 0.14);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+/* ==========================================================================
+   2. GLOBAL BASE & UNIFIED ICON SYSTEM (.li)
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  transition: background var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 18px Lucide inline SVG wrapper */
+.li {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex-shrink: 0;
+  vertical-align: middle;
+  color: inherit;
+}
+.li svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes spinIcon { to { transform: rotate(360deg); } }
+.spin { animation: spinIcon 0.8s linear infinite; }
+
+/* Sticky Masthead */
+.ds-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+.brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+.ds-nav-links {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ds-nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--dur-fast);
+}
+.ds-nav-links a:hover { color: var(--accent); }
+@media (max-width: 900px) { .ds-nav-links { display: none; } }
+
+/* Main Page Container */
+.ds-main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 48px 24px 120px;
+}
+
+.ds-intro { margin-bottom: 56px; }
+.ds-eyebrow {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.ds-intro h1 {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.ds-intro p {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 68ch;
+}
+
+/* Section Shell */
+.ds-section { margin-bottom: 64px; }
+.sec-header {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sec-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-header p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.canvas-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.canvas-card.row-wrap {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.canvas-subhead {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  margin: 4px 0 -12px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   3. FOUNDATIONS & SPECIMEN
+   ========================================================================== */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+.swatch-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.swatch-color {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.swatch-name { font-size: 11.5px; font-weight: 600; }
+.swatch-token { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); }
+
+.type-row {
+  display: flex;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
+}
+.type-row:last-child { border-bottom: none; }
+.type-role {
+  width: 120px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+.icon-cell {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.icon-cell .li { color: var(--text); }
+
+/* ==========================================================================
+   4. APPLE CONTROL CENTER CAPSULE SLIDER (iOS 18 PATTERN)
+   ========================================================================== */
+.apple-capsule-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.apple-capsule-unit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.apple-capsule-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.apple-capsule-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.apple-capsule-subtext {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+/* The Apple iOS 18 Fluid Capsule Shell */
+.apple-capsule-slider {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  background: var(--surface-alt);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  cursor: ew-resize;
+  user-select: none;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+  touch-action: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.apple-capsule-slider:hover {
+  border-color: var(--border-focus);
+}
+.apple-capsule-slider:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* Fluid Progress Track Fill */
+.apple-capsule-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+/* Interior Content Layer */
+.apple-capsule-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  pointer-events: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  z-index: 2;
+}
+.apple-capsule-icon-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  transition: color var(--dur-fast);
+}
+.apple-capsule-readout {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 700;
+  transition: color var(--dur-fast);
+}
+
+/* Dynamic Text Inversion when slider fill passes threshold */
+.apple-capsule-slider.invert-text .apple-capsule-icon-box,
+.apple-capsule-slider.invert-text .apple-capsule-readout {
+  color: var(--accent-contrast);
+}
+
+/* Compact Size Variant (38px height) */
+.apple-capsule-slider.compact {
+  height: 38px;
+}
+.apple-capsule-slider.compact .apple-capsule-layer {
+  padding: 0 14px;
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   5. FLOWBITE RADIO SUITE & SELECTABLE CARDS
+   ========================================================================== */
+.radio-showcase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+@media (max-width: 800px) { .radio-showcase-grid { grid-template-columns: 1fr; } }
+
+.fb-radio-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.fb-radio {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+  transition: all var(--dur-fast);
+}
+.fb-radio:hover { border-color: var(--text-muted); }
+.fb-radio:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.fb-radio::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  transform: scale(0);
+  transition: transform 120ms ease;
+}
+.fb-radio:checked::before { transform: scale(1); }
+.fb-radio:focus-visible {
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  outline: none;
+}
+
+.fb-radio-text h4 { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.fb-radio-text p { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+/* Flowbite Bordered Radio List Group */
+.fb-radio-listgroup {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.fb-radio-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.fb-radio-row:last-child { border-bottom: none; }
+.fb-radio-row:hover { background: var(--surface-alt); }
+.fb-radio-row.active { background: var(--accent-tint); }
+
+/* Flowbite Selectable Radio Cards */
+.fb-radio-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+.fb-card-option {
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px;
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all var(--dur-fast);
+  position: relative;
+}
+.fb-card-option:hover {
+  border-color: var(--border-focus);
+  background: var(--surface-alt);
+}
+.fb-card-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.fb-card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.fb-card-price { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent); }
+.fb-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+/* ==========================================================================
+   6. FLOWBITE-GRADE FORM INPUTS & FLOATING LABELS
+   ========================================================================== */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.floating-group { position: relative; }
+.floating-input {
+  width: 100%;
+  padding: 18px 14px 6px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all var(--dur-fast);
+}
+.floating-label {
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  font-size: 13px;
+  color: var(--text-faint);
+  pointer-events: none;
+  transition: all var(--dur-fast);
+}
+.floating-input:focus ~ .floating-label,
+.floating-input:not(:placeholder-shown) ~ .floating-label {
+  top: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.floating-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-wrapper input {
+  padding-left: 36px;
+  padding-right: 48px;
+}
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-faint);
+}
+.search-wrapper .kbd-badge {
+  position: absolute;
+  right: 10px;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   7. CORE ACTIONS & NAVIGATION PRIMITIVES
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--dur-fast);
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: var(--accent-contrast); }
+.btn-primary:hover { opacity: 0.92; }
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { background: var(--surface-alt); }
+.btn-outline { background: transparent; color: var(--accent); border-color: var(--accent); }
+.btn-outline:hover { background: var(--accent-tint); }
+.btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+.btn-ghost:hover { background: var(--surface-alt); color: var(--text); }
+.btn-danger { background: var(--danger-dim); color: var(--danger); }
+.btn-danger:hover { opacity: 0.9; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* Switch Toggle */
+.switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur-fast);
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(20px); }
+
+/* Segmented Control */
+.segment {
+  display: inline-flex;
+  background: var(--surface-alt);
+  border-radius: var(--r-sm);
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--border);
+}
+.segment button {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--r-xs);
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.segment button.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Stepper */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+}
+.stepper button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.stepper .val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ==========================================================================
+   8. DATA DISPLAY & FEEDBACK
+   ========================================================================== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kpi-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); font-weight: 700; }
+.kpi-delta {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+}
+.kpi-delta.up { background: var(--success-dim); color: var(--success); }
+.kpi-delta.down { background: var(--danger-dim); color: var(--danger); }
+.kpi-val { font-size: 1.85rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+
+.star-rating { display: inline-flex; gap: 4px; }
+.star-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  transition: color var(--dur-fast);
+}
+.star-btn.active { color: #F59E0B; }
+
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot.ok { background: var(--success); }
+.dot.warn { background: var(--warning); }
+.dot.err { background: var(--danger); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.badge.req { border-color: var(--accent); color: var(--accent); background: var(--accent-tint); }
+
+.table-scroller {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  width: 100%;
+}
+table.clean-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+table.clean-table th {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+table.clean-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+table.clean-table tr:last-child td { border-bottom: none; }
+table.clean-table tr:hover td { background: var(--surface-alt); }
+
+/* ==========================================================================
+   9. WORKSPACE CONVERSATIONAL AI & MORPHING DOCK
+   ========================================================================== */
+.demo-chat-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.demo-chat-feed {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chat-turn-me {
+  align-self: flex-end;
+  max-width: 80%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 11px 16px;
+  border-radius: var(--r-bubble);
+  border-bottom-right-radius: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-turn-agent {
+  align-self: flex-start;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reasoning-wrapper {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  max-width: 580px;
+  width: 100%;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.reasoning-wrapper.collapsed {
+  border-radius: var(--r-pill);
+  width: fit-content;
+}
+.reasoning-wrapper.collapsed:hover { border-color: var(--border-focus); }
+
+.reasoning-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  user-select: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.reasoning-header:hover { color: var(--text); }
+.reasoning-chevron { transition: transform var(--dur-fast) var(--ease-spring); }
+.reasoning-wrapper:not(.collapsed) .reasoning-chevron { transform: rotate(90deg); }
+
+.reasoning-body {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.reasoning-wrapper.collapsed .reasoning-body { display: none; }
+
+.trace-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.trace-step code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--surface);
+  padding: 1px 5px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border);
+}
+
+.agent-prose {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 720px;
+}
+.agent-prose p { margin-bottom: 10px; }
+.agent-prose p:last-child { margin-bottom: 0; }
+
+/* Morphing Composer Dock */
+.morph-dock {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 20px;
+  transition: all var(--dur-med) var(--ease-out);
+  position: relative;
+}
+.morph-dock.approval-active {
+  border-top-color: var(--accent);
+  box-shadow: 0 -4px 18px var(--accent-glow);
+}
+
+.morph-inner {
+  position: relative;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+}
+
+.morph-form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity var(--dur-fast), transform var(--dur-fast);
+}
+.morph-dock.approval-active .morph-form {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  position: absolute;
+}
+
+.morph-input-shell {
+  flex: 1;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+}
+.morph-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+}
+
+.morph-approval-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity var(--dur-med), transform var(--dur-med) var(--ease-spring);
+  position: absolute;
+}
+.morph-dock.approval-active .morph-approval-bar {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  position: relative;
+}
+
+.approval-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--warning);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.approval-prompt-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.kbd-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+/* ==========================================================================
+   10. ADMIN STUDIO PATTERNS (SENTENCE FIRST & API CODE)
+   ========================================================================== */
+.phrase-pill {
+  display: inline-block;
+  background: var(--accent-tint);
+  color: var(--accent);
+  border-radius: var(--r-xs);
+  padding: 1px 7px;
+  border: 1px dashed var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.api-code-block {
+  background: #181716;
+  color: #ECE7DE;
+  border-radius: var(--r-sm);
+  padding: 16px 20px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+.api-code-block .m { color: #F08E5A; font-weight: 700; }
+.api-code-block .p { color: #53C378; }
+.api-code-block .c { color: #736C63; font-style: italic; }
+
+/* ==========================================================================
+   11. GATEWAY KINETIC SCULPTURE & ERROR SHAKE
+   ========================================================================== */
+.kinetic-canvas-container {
+  width: 100%;
+  max-width: 440px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+@keyframes orbitCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes orbitCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+@keyframes coreScale { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.12); opacity: 1; } }
+@keyframes ripplePulse { 0% { r: 8px; opacity: 0.8; stroke-width: 1.5; } 100% { r: 65px; opacity: 0; stroke-width: 0.5; } }
+
+.orbit-cw { transform-origin: 200px 120px; animation: orbitCW 40s linear infinite; }
+.orbit-ccw { transform-origin: 200px 120px; animation: orbitCCW 24s linear infinite; }
+.core-pulse { transform-origin: 200px 120px; animation: coreScale 3s ease-in-out infinite; }
+.ripple-1 { animation: ripplePulse 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite; }
+.ripple-2 { animation: ripplePulse 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite 1.4s; }
+
+@keyframes tactileShakeAnim {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-8px); }
+  30%, 60%, 90% { transform: translateX(8px); }
+}
+.shake-card-demo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  max-width: 380px;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.shake-card-demo.shake {
+  animation: tactileShakeAnim 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 1px var(--danger), var(--shadow-card) !important;
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="ds-topbar">
+  <div class="brand-lockup">
+    <span>Amber</span>
+    <div class="brand-dot"></div>
+    <span style="font-family:var(--font-sans);font-weight:700;font-size:14px;color:var(--text-muted)">Component System</span>
+  </div>
+
+  <nav class="ds-nav-links">
+    <a href="#foundations">Foundations</a>
+    <a href="#capsule-sliders">Apple Sliders</a>
+    <a href="#radios">Flowbite Radios</a>
+    <a href="#forms">Forms</a>
+    <a href="#workspace">Workspace (Chat)</a>
+    <a href="#admin">Admin Studio</a>
+    <a href="#gateway">Gateway Kinetic</a>
+  </nav>
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="btn btn-secondary btn-sm" onclick="toggleTheme()" title="Toggle visual theme">
+      <span class="li" id="themeIcon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+      <span id="themeLabel">Dark</span>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN CONTAINER -->
+<main class="ds-main">
+
+  <div class="ds-intro">
+    <div class="ds-eyebrow">Enterprise Reference Library</div>
+    <h1>Comprehensive. Tactile. Disciplined.</h1>
+    <p>
+      Complete design system engineered for full-stack applications. Integrates Apple’s iOS 18 Control Center Capsule Slider, Flowbite-grade forms &amp; radio suites, open-canvas AI chat loops, and master-detail relational telemetry decks.
+    </p>
+  </div>
+
+  <!-- SECTION 1: FOUNDATIONS -->
+  <section class="ds-section" id="foundations">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></span>
+        01. Foundations &amp; System Tokens
+      </h2>
+      <p>Terracotta palette, font pairing rules, and the zero-dependency 1.5px stroke Lucide vector library.</p>
+    </div>
+
+    <div class="canvas-card">
+      <div class="canvas-subhead">Color Swatches</div>
+      <div class="swatch-grid">
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--accent)"></div><span class="swatch-name">accent</span><span class="swatch-token">primary</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--accent-tint)"></div><span class="swatch-name">accent-tint</span><span class="swatch-token">selection</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--surface)"></div><span class="swatch-name">surface</span><span class="swatch-token">cards</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--surface-alt)"></div><span class="swatch-name">surface-alt</span><span class="swatch-token">recessed</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--border)"></div><span class="swatch-name">border</span><span class="swatch-token">dividers</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--success)"></div><span class="swatch-name">success</span><span class="swatch-token">healthy</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--warning)"></div><span class="swatch-name">warning</span><span class="swatch-token">attention</span></div>
+        <div class="swatch-card"><div class="swatch-color" style="background:var(--danger)"></div><span class="swatch-name">danger</span><span class="swatch-token">error</span></div>
+      </div>
+
+      <div class="canvas-subhead" style="margin-top:14px">Typography Hierarchy</div>
+      <div style="display:flex;flex-direction:column">
+        <div class="type-row">
+          <span class="type-role">Serif Identity</span>
+          <span style="font-family:var(--font-serif);font-size:1.85rem;font-weight:700;letter-spacing:-0.02em">Notes Worth Keeping</span>
+        </div>
+        <div class="type-row">
+          <span class="type-role">Sentence Sans</span>
+          <span style="font-size:1.2rem;font-weight:700;letter-spacing:-0.01em">Runs every weekday at 09:00 AM</span>
+        </div>
+        <div class="type-row">
+          <span class="type-role">UI Language</span>
+          <span style="font-size:14px;color:var(--text-muted)">Inter carries form labels, dialogue buttons, and operational copy.</span>
+        </div>
+        <div class="type-row">
+          <span class="type-role">Machine Truth</span>
+          <span style="font-family:var(--font-mono);font-size:12.5px;color:var(--accent);background:var(--accent-tint);padding:2px 7px;border-radius:4px">cron: 0 9 * * 1-5 // hash: #0x8FA</span>
+        </div>
+      </div>
+
+      <div class="canvas-subhead" style="margin-top:14px">Complete 1.5px Stroke Lucide Vector Icons (No CDN)</div>
+      <div class="icon-grid" id="iconSpecimenContainer"></div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: APPLE CONTROL CENTER CAPSULE SLIDER (iOS 18 PATTERN ONLY) -->
+  <section class="ds-section" id="capsule-sliders">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>
+        02. Sliders: Apple Control Center Capsule Pattern (iOS 18)
+      </h2>
+      <p>Retained exclusively as the slider standard: fluid touch/drag scrub capsules with tactile progress and contrast inversion.</p>
+    </div>
+
+    <div class="canvas-card">
+      <div class="apple-capsule-stack">
+        
+        <!-- Capsule Slider 1: Reasoning Intensity (0–100%) -->
+        <div class="apple-capsule-unit">
+          <div class="apple-capsule-head">
+            <span class="apple-capsule-title">Reasoning Effort &amp; Inference Depth</span>
+            <span class="apple-capsule-subtext">Drag or click to scrub</span>
+          </div>
+          <div class="apple-capsule-slider" id="capsule1" data-val="65" data-min="0" data-max="100" data-unit="%" tabindex="0" role="slider" aria-valuenow="65" aria-label="Reasoning Effort">
+            <div class="apple-capsule-fill" style="width: 65%;"></div>
+            <div class="apple-capsule-layer">
+              <div class="apple-capsule-icon-box">
+                <span class="li"><svg viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span>
+                <span>Autonomous Reasoning</span>
+              </div>
+              <span class="apple-capsule-readout">65%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capsule Slider 2: Currency Allocation ($500 - $5,000) -->
+        <div class="apple-capsule-unit">
+          <div class="apple-capsule-head">
+            <span class="apple-capsule-title">Monthly Partition Budget</span>
+            <span class="apple-capsule-subtext">Step value: $250</span>
+          </div>
+          <div class="apple-capsule-slider" id="capsule2" data-val="2500" data-min="500" data-max="5000" data-unit="$" data-prefix="true" tabindex="0" role="slider" aria-valuenow="2500" aria-label="Monthly Budget">
+            <div class="apple-capsule-fill" style="width: 44.4%;"></div>
+            <div class="apple-capsule-layer">
+              <div class="apple-capsule-icon-box">
+                <span class="li"><svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/></svg></span>
+                <span>Compute Allocation</span>
+              </div>
+              <span class="apple-capsule-readout">$2,500</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capsule Slider 3: Compact Size Variant (38px height) -->
+        <div class="apple-capsule-unit">
+          <div class="apple-capsule-head">
+            <span class="apple-capsule-title">Compact System Audio / Volume</span>
+            <span class="apple-capsule-subtext">Compact 38px Capsule</span>
+          </div>
+          <div class="apple-capsule-slider compact" id="capsule3" data-val="82" data-min="0" data-max="100" data-unit="%" tabindex="0" role="slider" aria-valuenow="82" aria-label="Audio Volume">
+            <div class="apple-capsule-fill" style="width: 82%;"></div>
+            <div class="apple-capsule-layer">
+              <div class="apple-capsule-icon-box">
+                <span class="li"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span>
+                <span>Output Level</span>
+              </div>
+              <span class="apple-capsule-readout">82%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: FLOWBITE RADIO SUITE & CARDS -->
+  <section class="ds-section" id="radios">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg></span>
+        03. Flowbite Radio Controls &amp; Selectable Cards
+      </h2>
+      <p>High-contrast focus rings, list-group stacks with helper copy, and selectable pricing/plan cards.</p>
+    </div>
+
+    <div class="canvas-card">
+      <div class="radio-showcase-grid">
+        
+        <!-- Standard Radios -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="canvas-subhead">Standard Radios with Helper Text</div>
+          
+          <label class="fb-radio-label">
+            <input type="radio" name="deliveryOption" class="fb-radio" checked>
+            <div class="fb-radio-text">
+              <h4>Standard Delivery</h4>
+              <p>Delivery in 3–5 business days. Included with all basic accounts.</p>
+            </div>
+          </label>
+
+          <label class="fb-radio-label">
+            <input type="radio" name="deliveryOption" class="fb-radio">
+            <div class="fb-radio-text">
+              <h4>Priority Express</h4>
+              <p>Guaranteed overnight dispatch via Stripe courier webhook.</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- Bordered List Group -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="canvas-subhead">Bordered List Group Radios</div>
+          
+          <div class="fb-radio-listgroup">
+            <label class="fb-radio-row active" onclick="highlightRadioRow(this)">
+              <input type="radio" name="permissionRole" class="fb-radio" checked>
+              <div class="fb-radio-text">
+                <h4>System Administrator</h4>
+                <p>Full schema migration and partition root access.</p>
+              </div>
+            </label>
+            <label class="fb-radio-row" onclick="highlightRadioRow(this)">
+              <input type="radio" name="permissionRole" class="fb-radio">
+              <div class="fb-radio-text">
+                <h4>Coworker Member</h4>
+                <p>Chat access and proposed action sign-off gates.</p>
+              </div>
+            </label>
+            <label class="fb-radio-row" onclick="highlightRadioRow(this)">
+              <input type="radio" name="permissionRole" class="fb-radio">
+              <div class="fb-radio-text">
+                <h4>Read-Only Auditor</h4>
+                <p>Inspect telemetry logs without ledger write permissions.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Selectable Radio Cards -->
+      <div class="canvas-subhead" style="margin-top:14px">Selectable Radio Cards (Flowbite Pro Pattern)</div>
+      <div class="fb-radio-cards-grid">
+        
+        <div class="fb-card-option selected" onclick="selectRadioCard(this, 'tierCard')">
+          <input type="radio" name="tierCard" class="fb-radio" checked style="position:absolute;top:16px;right:16px">
+          <div class="fb-card-title">Starter Engine</div>
+          <div class="fb-card-price">$29 <span style="font-size:11px;color:var(--text-muted);font-weight:400">/ mo</span></div>
+          <div class="fb-card-desc">For small teams building first autonomous workflows.</div>
+        </div>
+
+        <div class="fb-card-option" onclick="selectRadioCard(this, 'tierCard')">
+          <input type="radio" name="tierCard" class="fb-radio" style="position:absolute;top:16px;right:16px">
+          <div class="fb-card-title">Business Pro</div>
+          <div class="fb-card-price">$89 <span style="font-size:11px;color:var(--text-muted);font-weight:400">/ mo</span></div>
+          <div class="fb-card-desc">Multi-agent harnesses, unlimited collections, and priority SSE.</div>
+        </div>
+
+        <div class="fb-card-option" onclick="selectRadioCard(this, 'tierCard')">
+          <input type="radio" name="tierCard" class="fb-radio" style="position:absolute;top:16px;right:16px">
+          <div class="fb-card-title">Enterprise Dedicated</div>
+          <div class="fb-card-price">$249 <span style="font-size:11px;color:var(--text-muted);font-weight:400">/ mo</span></div>
+          <div class="fb-card-desc">Custom LLM endpoints, private cluster partitions, and SLAs.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: FLOWBITE FORM CONTROLS & FLOATING LABELS -->
+  <section class="ds-section" id="forms">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span>
+        04. Floating Labels &amp; Advanced Inputs
+      </h2>
+      <p>Modern floating label animations, search with KBD shortcuts, and validation borders.</p>
+    </div>
+
+    <div class="canvas-card">
+      <div class="form-grid-3">
+        
+        <div class="floating-group">
+          <input type="text" class="floating-input" id="fl1" placeholder=" ">
+          <label for="fl1" class="floating-label">Database Partition Name</label>
+        </div>
+
+        <div class="floating-group">
+          <input type="email" class="floating-input" id="fl2" placeholder=" " value="jane@company.com">
+          <label for="fl2" class="floating-label">Operator Email Address</label>
+        </div>
+
+        <div class="search-wrapper">
+          <span class="li search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input class="f-input" placeholder="Quick search collections...">
+          <span class="kbd kbd-badge">⌘K</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: WORKSPACE (CHAT & HUMAN-IN-THE-LOOP) -->
+  <section class="ds-section" id="workspace">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>
+        05. Coworker Workspace (Conversational &amp; Approvals)
+      </h2>
+      <p>Open-canvas prose (no bubble container around agent messages), encapsulated reasoning traces, and morphing input bars.</p>
+    </div>
+
+    <div class="demo-chat-box">
+      <div class="demo-chat-feed">
+        <!-- Turn: User -->
+        <div class="chat-turn-me">
+          Can you reconcile invoice #1042 and draft a credit memo for the duplicate line items?
+        </div>
+
+        <!-- Turn: Agent (NO BUBBLE, Reasoning Trace Appears First) -->
+        <div class="chat-turn-agent">
+          <!-- 1. Reasoning Wrapper (Wraps list when expanded) -->
+          <div class="reasoning-wrapper" id="specimenReasoning">
+            <button class="reasoning-header" onclick="document.getElementById('specimenReasoning').classList.toggle('collapsed')">
+              <span class="li reasoning-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span>
+              <span>Reasoning trace · 3 operations</span>
+              <span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--text-faint)">1.2s</span>
+            </button>
+            <div class="reasoning-body">
+              <div class="trace-step">
+                <span class="li" style="color:var(--success)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span>Queried records in <code>invoices</code> for ID #1042 (found 1 match)</span>
+              </div>
+              <div class="trace-step">
+                <span class="li" style="color:var(--success)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span>Verified discrepancy amount of <strong>$240.00</strong> against Stripe webhook log</span>
+              </div>
+              <div class="trace-step">
+                <span class="li" style="color:var(--success)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span>Drafted mutation payload for credit memo <code>#CM-809</code></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Agent Prose: Open Canvas (NO bubble around it) -->
+          <div class="agent-prose">
+            <p>I verified invoice #1042. There is an overcharge of $240.00 resulting from duplicated item entries on the invoice payload.</p>
+            <p>I have prepared the draft credit memo for Acme Corp, but I need your authorization before committing the write to the live invoices ledger:</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. MORPHING COMPOSER DOCK (Interactive Demo) -->
+      <div class="morph-dock approval-active" id="demoMorphDock">
+        <div class="morph-inner">
+          
+          <!-- State A: Regular Text Form -->
+          <form class="morph-form" id="morphForm" onsubmit="event.preventDefault(); toggleMorphDemo();">
+            <div class="morph-input-shell">
+              <input class="morph-input" placeholder="Type a message or press Enter to test morph...">
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <span class="li" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span>
+              <span>Send</span>
+            </button>
+          </form>
+
+          <!-- State B: Morphed Decision Controls -->
+          <div class="morph-approval-bar" id="morphBar">
+            <div>
+              <div class="approval-badge">
+                <span class="dot warn"></span> ACTION APPROVAL REQUIRED
+              </div>
+              <div class="approval-prompt-title">
+                Create record in <code>invoices</code>: Credit memo #CM-809 ($240.00)
+              </div>
+            </div>
+            <div style="display:flex;gap:8px" id="morphDecisionSlot">
+              <button class="btn btn-primary btn-sm" onclick="resolveMorphDemo(true)">
+                <span class="li" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span>Approve &amp; Commit</span>
+                <span class="kbd-tag">⌘↵</span>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="resolveMorphDemo(false)">
+                <span class="li" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                <span>Deny</span>
+                <span class="kbd-tag">esc</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: ADMIN STUDIO PATTERNS -->
+  <section class="ds-section" id="admin">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>
+        06. Admin Data Studio &amp; Telemetry
+      </h2>
+      <p>Sentence-first operational logic, SVG system metrics, and full REST &amp; Realtime API reference.</p>
+    </div>
+
+    <div class="canvas-card">
+      <div class="canvas-subhead">Sentence-First Operational Configuration</div>
+      <div style="font-size:1.25rem;font-weight:700;line-height:1.4">
+        Runs every <span class="phrase-pill">weekday</span> at <span class="phrase-pill">09:00 AM</span> targeting model <span class="phrase-pill">Claude Sonnet 3.7</span> with <span class="phrase-pill">2 retries</span>.
+      </div>
+
+      <div class="canvas-subhead" style="margin-top:16px">Syntax-Highlighted API Reference Block</div>
+      <div class="api-code-block">
+<span class="m">POST</span> <span class="p">/api/collections/invoices/records</span>
+<span class="c">// Authorization: Bearer jwt.token.string</span>
+{
+  <span style="color:#F2B957">"customer_id"</span>: "cust_9014",
+  <span style="color:#F2B957">"amount"</span>: 240.00,
+  <span style="color:#F2B957">"status"</span>: "settled"
+}</div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: GATEWAY KINETIC & TACTILE SHAKE -->
+  <section class="ds-section" id="gateway">
+    <div class="sec-header">
+      <h2>
+        <span class="li" style="color:var(--accent)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg></span>
+        07. Gateway Kinetic Art &amp; Error Shake
+      </h2>
+      <p>The vector kinetic sculpture and the reflow-guaranteed tactile card error shake.</p>
+    </div>
+
+    <div class="canvas-card row-wrap" style="justify-content:space-between">
+      <!-- Kinetic Sculpture -->
+      <div class="kinetic-canvas-container">
+        <svg viewBox="0 0 400 240" fill="none" style="width:100%;height:100%">
+          <g stroke="var(--border)" stroke-width="0.8" opacity="0.6">
+            <line x1="40" y1="120" x2="360" y2="120" stroke-dasharray="3 6"/>
+            <line x1="200" y1="20" x2="200" y2="220" stroke-dasharray="3 6"/>
+            <circle cx="200" cy="120" r="110" stroke-dasharray="2 6"/>
+            <circle cx="200" cy="120" r="75"/>
+          </g>
+
+          <!-- Ripples -->
+          <circle cx="200" cy="120" r="8" fill="none" stroke="var(--accent)" class="ripple-1"/>
+          <circle cx="200" cy="120" r="8" fill="none" stroke="var(--accent)" class="ripple-2"/>
+
+          <!-- Rotating Orbits -->
+          <g class="orbit-cw">
+            <ellipse cx="200" cy="120" rx="112" ry="85" stroke="var(--border)" stroke-width="1.2" stroke-dasharray="6 10"/>
+            <circle cx="95" cy="80" r="4.5" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+          </g>
+          <g class="orbit-ccw">
+            <path d="M200 45 L265 82 L265 158 L200 195 L135 158 L135 82 Z" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="4 8" opacity="0.45"/>
+            <circle cx="265" cy="82" r="4" fill="var(--accent)"/>
+          </g>
+
+          <!-- Core Pulse -->
+          <g class="core-pulse">
+            <circle cx="200" cy="120" r="12" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.5"/>
+            <circle cx="200" cy="120" r="4" fill="var(--accent)"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Tactile Card Shake Interactive Test -->
+      <div class="shake-card-demo" id="shakeCardTest">
+        <h3 style="font-family:var(--font-serif);font-size:1.3rem;margin-bottom:6px">Tactile Error Shake</h3>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">
+          Uses spring displacement and forced DOM reflow (<code style="font-family:var(--font-mono);color:var(--accent)">void card.offsetWidth</code>) to ensure repeated error clicks always replay cleanly.
+        </p>
+        <button class="btn btn-danger btn-sm" onclick="triggerShakeDemo()">
+          Test Shake Animation
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ==========================================================================
+   LUCIDE ICON MAP & RUNTIME DOM BUILDER
+   ========================================================================== */
+const LUCIDE = {
+  'moon': '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  'sun': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  'layout-grid': '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  'users': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  'bot': '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  'activity': '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  'check': '<path d="M20 6 9 17l-5-5"/>',
+  'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  'trash-2': '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+  'pencil': '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+  'search': '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  'plus': '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  'minus': '<path d="M5 12h14"/>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
+  'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+  'chevron-left': '<path d="m15 18-6-6 6-6"/>',
+  'chevron-up': '<path d="m18 15-6-6-6 6"/>',
+  'clock': '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  'calendar': '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>',
+  'database': '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
+  'shield': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  'lock': '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  'file-text': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  'folder': '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  'sparkles': '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>'
+};
+
+function iconSvg(name, cls) {
+  const span = document.createElement('span');
+  span.className = cls ? `li ${cls}` : 'li';
+  span.setAttribute('aria-hidden', 'true');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '1.5');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  if (LUCIDE[name]) svg.innerHTML = LUCIDE[name];
+  span.appendChild(svg);
+  return span;
+}
+
+(function renderIcons() {
+  const container = document.getElementById('iconSpecimenContainer');
+  if (!container) return;
+  Object.keys(LUCIDE).forEach(key => {
+    const cell = document.createElement('div');
+    cell.className = 'icon-cell';
+    cell.appendChild(iconSvg(key));
+    const label = document.createElement('span');
+    label.textContent = key;
+    cell.appendChild(label);
+    container.appendChild(cell);
+  });
+})();
+
+/* ==========================================================================
+   APPLE CONTROL CENTER CAPSULE SLIDER (iOS 18) ENGINE
+   ========================================================================== */
+function initAppleCapsuleSliders() {
+  document.querySelectorAll('.apple-capsule-slider').forEach(capsule => {
+    let isDragging = false;
+
+    const updateFromPosition = (clientX) => {
+      const rect = capsule.getBoundingClientRect();
+      const rawX = clientX - rect.left;
+      const pct = Math.max(0, Math.min(100, (rawX / rect.width) * 100));
+
+      const min = parseFloat(capsule.dataset.min) || 0;
+      const max = parseFloat(capsule.dataset.max) || 100;
+      const unit = capsule.dataset.unit || '';
+      const isPrefix = capsule.dataset.prefix === 'true';
+
+      const computedValue = Math.round(min + (pct / 100) * (max - min));
+      capsule.dataset.val = computedValue;
+      capsule.setAttribute('aria-valuenow', computedValue);
+
+      const fill = capsule.querySelector('.apple-capsule-fill');
+      const readout = capsule.querySelector('.apple-capsule-readout');
+
+      if (fill) fill.style.width = pct + '%';
+      if (readout) {
+        readout.textContent = isPrefix ? unit + computedValue.toLocaleString() : computedValue.toLocaleString() + unit;
+      }
+
+      // Invert text contrast when the slider is mostly filled (Apple HIG)
+      capsule.classList.toggle('invert-text', pct > 55);
+    };
+
+    // Pointer events for desktop drag & mobile touch
+    capsule.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      capsule.setPointerCapture(e.pointerId);
+      updateFromPosition(e.clientX);
+    });
+
+    capsule.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      updateFromPosition(e.clientX);
+    });
+
+    capsule.addEventListener('pointerup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      try { capsule.releasePointerCapture(e.pointerId); } catch(err) {}
+    });
+
+    capsule.addEventListener('pointercancel', () => { isDragging = false; });
+
+    // Keyboard support (Arrow Left/Right)
+    capsule.addEventListener('keydown', (e) => {
+      let currentVal = parseFloat(capsule.dataset.val) || 0;
+      const min = parseFloat(capsule.dataset.min) || 0;
+      const max = parseFloat(capsule.dataset.max) || 100;
+      const step = (max - min) / 20;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const next = Math.min(max, currentVal + step);
+        const rect = capsule.getBoundingClientRect();
+        updateFromPosition(rect.left + ((next - min) / (max - min)) * rect.width);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const prev = Math.max(min, currentVal - step);
+        const rect = capsule.getBoundingClientRect();
+        updateFromPosition(rect.left + ((prev - min) / (max - min)) * rect.width);
+      }
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initAppleCapsuleSliders);
+
+/* ==========================================================================
+   OTHER INTERACTIVE PATTERNS
+   ========================================================================== */
+
+/* Theme Toggle */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+
+  document.getElementById('themeLabel').textContent = isDark ? 'Dark' : 'Light';
+  const icon = document.getElementById('themeIcon');
+  icon.innerHTML = isDark
+    ? '<svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+    : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
+}
+
+/* Morphing Composer Dock Demo */
+function toggleMorphDemo() {
+  document.getElementById('demoMorphDock').classList.toggle('approval-active');
+}
+
+function resolveMorphDemo(approved) {
+  const slot = document.getElementById('morphDecisionSlot');
+  const dock = document.getElementById('demoMorphDock');
+  
+  if (approved) {
+    slot.innerHTML = `<span style="color:var(--success);font-size:12.5px;font-weight:600">✓ Authorized &amp; Committed</span>`;
+  } else {
+    slot.innerHTML = `<span style="color:var(--danger);font-size:12.5px;font-weight:600">✗ Rejected</span>`;
+  }
+
+  setTimeout(() => {
+    dock.classList.remove('approval-active');
+    setTimeout(() => {
+      slot.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="resolveMorphDemo(true)">
+          <span class="li" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span>Approve &amp; Commit</span>
+          <span class="kbd-tag">⌘↵</span>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="resolveMorphDemo(false)">
+          <span class="li" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+          <span>Deny</span>
+          <span class="kbd-tag">esc</span>
+        </button>`;
+    }, 400);
+  }, 1000);
+}
+
+/* Card Shake Demo with Reflow Guarantee */
+function triggerShakeDemo() {
+  const card = document.getElementById('shakeCardTest');
+  card.classList.remove('shake');
+  void card.offsetWidth;
+  card.classList.add('shake');
+  setTimeout(() => card.classList.remove('shake'), 450);
+}
+
+/* Flowbite Radio Selectable Cards */
+function selectRadioCard(cardEl, radioName) {
+  const group = document.querySelectorAll(`input[name="${radioName}"]`);
+  group.forEach(input => {
+    input.checked = false;
+    input.closest('.fb-card-option').classList.remove('selected');
+  });
+  cardEl.classList.add('selected');
+  cardEl.querySelector('input[type="radio"]').checked = true;
+}
+
+function highlightRadioRow(rowEl) {
+  const group = rowEl.closest('.fb-radio-listgroup');
+  group.querySelectorAll('.fb-radio-row').forEach(r => r.classList.remove('active'));
+  rowEl.classList.add('active');
+  rowEl.querySelector('input[type="radio"]').checked = true;
+}
+
+/* Stepper Demo */
+function stepVal(delta) {
+  const el = document.getElementById('demoCounter');
+  let current = parseInt(el.textContent, 10) || 0;
+  el.textContent = Math.max(1, current + delta);
+}
+
+function setSegment(btn) {
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* Keyboard ergonomics demo for morphed dock (⌘↵ / Esc) */
+window.addEventListener('keydown', (e) => {
+  const dock = document.getElementById('demoMorphDock');
+  if (!dock.classList.contains('approval-active')) return;
+
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    e.preventDefault();
+    resolveMorphDemo(true);
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    resolveMorphDemo(false);
+  }
+});
+</script>
+</body>
+</html>
